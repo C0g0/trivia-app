@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Category {
-  final int? id;
+  final String? id;
   final String name;
   final Image icon;
 

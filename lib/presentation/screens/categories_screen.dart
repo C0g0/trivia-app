@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:quiz_app/domain/entities/category.dart';
 import 'package:quiz_app/presentation/blocs/trivia/trivia_bloc.dart';
 import 'package:quiz_app/presentation/widgets/widgets.dart';
 
@@ -9,6 +10,8 @@ class CategoriesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final triviaBloc = context.read<TriviaBloc>();
+
     final size = MediaQuery.of(context).size;
     final height = size.height;
     final width = size.width;
@@ -48,90 +51,11 @@ class CategoriesScreen extends StatelessWidget {
                         ...categories.map(
                           (categorie) => GestureDetector(
                             onTap: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: Center(
-                                        child: Text(
-                                          'Choose dificulty',
-                                          style: GoogleFonts.poppins(
-                                              fontSize: height * 0.03,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      content: SizedBox(
-                                        height: height * 0.25,
-                                        child: Column(
-                                          children: [
-                                            MaterialButton(
-                                              minWidth: width * 0.3,
-                                              elevation: 10,
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                        const SnackBar(
-                                                  content: Text(
-                                                      'Creating new game...'),
-                                                  duration:
-                                                      Duration(seconds: 1),
-                                                ));
-                                              },
-                                              shape: const StadiumBorder(),
-                                              color: Colors.grey.shade300,
-                                              splashColor: Colors.green,
-                                              child: Text(
-                                                'Easy',
-                                                style: GoogleFonts.fredoka(
-                                                    fontSize: height * 0.025,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: height * 0.005,
-                                            ),
-                                            MaterialButton(
-                                              onPressed: () {},
-                                              minWidth: width * 0.3,
-                                              elevation: 10,
-                                              shape: const StadiumBorder(),
-                                              color: Colors.grey.shade300,
-                                              splashColor: Colors.orange,
-                                              child: Text(
-                                                'Medium',
-                                                style: GoogleFonts.fredoka(
-                                                    fontSize: height * 0.025,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: height * 0.005,
-                                            ),
-                                            MaterialButton(
-                                              onPressed: () {},
-                                              minWidth: width * 0.3,
-                                              elevation: 10,
-                                              shape: const StadiumBorder(),
-                                              color: Colors.grey.shade300,
-                                              splashColor: Colors.red,
-                                              child: Text(
-                                                'Hard',
-                                                style: GoogleFonts.fredoka(
-                                                    fontSize: height * 0.025,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  });
+                              _showDialog(context, height, width, triviaBloc,
+                                  categorie);
                             },
                             child: Container(
+                              alignment: Alignment.center,
                               decoration: const BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
@@ -171,6 +95,68 @@ class CategoriesScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Future<dynamic> _showDialog(BuildContext context, double height, double width,
+      TriviaBloc triviaBloc, Category categorie) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Center(
+              child: Text(
+                'Choose dificulty',
+                style: GoogleFonts.poppins(
+                    fontSize: height * 0.03, fontWeight: FontWeight.bold),
+              ),
+            ),
+            content: SizedBox(
+              height: height * 0.25,
+              child: Column(
+                children: [
+                  _dificultyButton(
+                      width, context, triviaBloc, categorie, height, 'easy'),
+                  SizedBox(
+                    height: height * 0.005,
+                  ),
+                  _dificultyButton(
+                      width, context, triviaBloc, categorie, height, 'medium'),
+                  SizedBox(
+                    height: height * 0.005,
+                  ),
+                  _dificultyButton(
+                      width, context, triviaBloc, categorie, height, 'hard'),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  MaterialButton _dificultyButton(
+      double width,
+      BuildContext context,
+      TriviaBloc triviaBloc,
+      Category category,
+      double height,
+      String dificulty) {
+    return MaterialButton(
+      minWidth: width * 0.3,
+      elevation: 10,
+      onPressed: () async {
+        Navigator.of(context).pop();
+        triviaBloc.loadQuestions(category.id!, dificulty, context);
+        Navigator.pushNamed(context, 'quiz');
+      },
+      shape: const StadiumBorder(),
+      color: Colors.grey.shade300,
+      splashColor: Colors.green,
+      child: Text(
+        dificulty,
+        style: GoogleFonts.fredoka(
+            fontSize: height * 0.025, fontWeight: FontWeight.w500),
       ),
     );
   }

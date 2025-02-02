@@ -1,18 +1,24 @@
 part of 'trivia_bloc.dart';
 
 class TriviaState extends Equatable {
-  final Category categorySelected;
+  final bool loadingQuestions;
+  final List<Question> questions;
   final List<Category> categories;
 
   const TriviaState(
-      {this.categories = const [], required this.categorySelected});
+      {this.loadingQuestions = false,
+      this.categories = const [],
+      this.questions = const []});
 
   TriviaState copyWith(
-          {Category? categorySelected, List<Category>? categories}) =>
+          {bool? loadingQuestions,
+          List<Category>? categories,
+          List<Question>? questions}) =>
       TriviaState(
-          categorySelected: categorySelected ?? this.categorySelected,
-          categories: categories ?? this.categories);
+          loadingQuestions: loadingQuestions ?? this.loadingQuestions,
+          categories: categories ?? this.categories,
+          questions: questions ?? this.questions);
 
   @override
-  List<Object> get props => [categorySelected, categories];
+  List<Object> get props => [loadingQuestions, categories, questions];
 }

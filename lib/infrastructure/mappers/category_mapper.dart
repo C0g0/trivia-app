@@ -5,7 +5,7 @@ import 'package:quiz_app/infrastructure/models/categories_response.dart';
 class CategoryMapper {
   static Category castToEntity(TriviaCategory category) {
     return Category(
-        id: category.id,
+        id: category.id.toString(),
         name: category.name,
         icon: Image.asset('assets/icon_${category.id}.png'));
   }

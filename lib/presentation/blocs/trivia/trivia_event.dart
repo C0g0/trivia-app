@@ -12,3 +12,13 @@ class CategoriesLoaded extends TriviaEvent {
 
   const CategoriesLoaded({required this.categories});
 }
+
+class LoadQuestions extends TriviaEvent {
+  final List<Question> questions;
+
+  const LoadQuestions({required this.questions});
+}
+
+class LoadingQuestions extends TriviaEvent {
+  const LoadingQuestions();
+}

@@ -1,6 +1,6 @@
-import 'package:quiz_app/domain/entities/category.dart';
+import 'package:quiz_app/domain/entities/entities.dart';
 
 abstract class TriviaRespository {
   Future<List<Category>> getCategories();
-  // Future<List<>>
+  Future<List<Question>> getQuestions({String categoryId, String dificulty});
 }
