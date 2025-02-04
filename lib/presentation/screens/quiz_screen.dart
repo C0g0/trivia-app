@@ -192,10 +192,79 @@ class QuizScreen extends StatelessWidget {
                               onPressed: () {
                                 //ToDo:
                                 //Validar respuesta correcta
-                                //abrir alert, mostrar respuesta correcta
+
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        actions: [
+                                          Center(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                //ToDo:
+                                                // Reanudar el temporizador
+                                                controller.swipe(
+                                                    CardSwiperDirection.left);
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Container(
+                                                width: width * 0.5,
+                                                height: height * 0.05,
+                                                decoration: BoxDecoration(
+                                                    border:
+                                                        Border.all(width: 2),
+                                                    color: const Color.fromARGB(
+                                                        255, 255, 253, 231),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            25)),
+                                                child: Center(
+                                                    child: Text(
+                                                  'Next question',
+                                                  style: GoogleFonts.poppins(
+                                                      fontSize: height * 0.015,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                )),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                        content: SizedBox(
+                                          height: height * 0.3,
+                                          child: Column(
+                                            children: [
+                                              Image.asset(
+                                                (answer ==
+                                                        question.correctAnswer)
+                                                    ? 'assets/check.png'
+                                                    : 'assets/cross.png',
+                                                width: width * 0.3,
+                                              ),
+                                              SizedBox(
+                                                height: height * 0.05,
+                                              ),
+                                              Text(
+                                                'Correct Answer',
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: height * 0.018,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                question.correctAnswer,
+                                                style: GoogleFonts.bungee(
+                                                    fontSize: height * 0.018),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    });
+                                //almacenar numero de respuestas correctas
                                 //pausar y reanudar temporizador
 
-                                controller.swipe(CardSwiperDirection.left);
+                                // controller.swipe(CardSwiperDirection.left);
                               },
                               shape: StadiumBorder(
                                   side: BorderSide(
