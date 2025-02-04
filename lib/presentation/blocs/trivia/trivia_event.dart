@@ -19,6 +19,6 @@ class LoadQuestions extends TriviaEvent {
   const LoadQuestions({required this.questions});
 }
 
-class LoadingQuestions extends TriviaEvent {
-  const LoadingQuestions();
+class Loading extends TriviaEvent {
+  const Loading();
 }

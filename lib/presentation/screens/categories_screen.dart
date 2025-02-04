@@ -18,36 +18,42 @@ class CategoriesScreen extends StatelessWidget {
 
     return Scaffold(
       body: BackgroundApp(
-        child: Padding(
-          padding: EdgeInsets.only(
-              top: height * 0.05, left: width * 0.05, right: width * 0.05),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Let\'s play!',
-                style: GoogleFonts.bungee(
-                    fontSize: height * 0.05, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Choose a category',
-                style: GoogleFonts.luckiestGuy(
-                    fontSize: height * 0.02,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade800),
-              ),
-              SizedBox(
-                height: height * 0.02,
-              ),
-              Expanded(child: BlocBuilder<TriviaBloc, TriviaState>(
-                builder: (context, triviaState) {
-                  final categories = triviaState.categories;
-                  return GridView(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: width * 0.05,
-                          mainAxisSpacing: height * 0.03),
-                      children: [
+        child: BlocBuilder<TriviaBloc, TriviaState>(
+          builder: (context, triviaState) {
+            final categories = triviaState.categories;
+            if (triviaState.isLoading) {
+              return LoadingAlert(
+                  content: 'Loading...', height: height, width: width);
+            }
+            return Padding(
+              padding: EdgeInsets.only(
+                  top: height * 0.05, left: width * 0.05, right: width * 0.05),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Let\'s play!',
+                    style: GoogleFonts.bungee(
+                        fontSize: height * 0.05, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Choose a category',
+                    style: GoogleFonts.luckiestGuy(
+                        fontSize: height * 0.02,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey.shade800),
+                  ),
+                  SizedBox(
+                    height: height * 0.02,
+                  ),
+                  Expanded(
+                      child: GridView(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: width * 0.05,
+                                  mainAxisSpacing: height * 0.03),
+                          children: [
                         ...categories.map(
                           (categorie) => GestureDetector(
                             onTap: () {
@@ -89,11 +95,11 @@ class CategoriesScreen extends StatelessWidget {
                             ),
                           ),
                         )
-                      ]);
-                },
-              )),
-            ],
-          ),
+                      ])),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
@@ -116,18 +122,18 @@ class CategoriesScreen extends StatelessWidget {
               height: height * 0.25,
               child: Column(
                 children: [
-                  _dificultyButton(
-                      width, context, triviaBloc, categorie, height, 'easy'),
+                  _dificultyButton(width, context, triviaBloc, categorie,
+                      height, 'easy', Colors.green),
                   SizedBox(
                     height: height * 0.005,
                   ),
-                  _dificultyButton(
-                      width, context, triviaBloc, categorie, height, 'medium'),
+                  _dificultyButton(width, context, triviaBloc, categorie,
+                      height, 'medium', Colors.orange),
                   SizedBox(
                     height: height * 0.005,
                   ),
-                  _dificultyButton(
-                      width, context, triviaBloc, categorie, height, 'hard'),
+                  _dificultyButton(width, context, triviaBloc, categorie,
+                      height, 'hard', Colors.red),
                 ],
               ),
             ),
@@ -141,7 +147,8 @@ class CategoriesScreen extends StatelessWidget {
       TriviaBloc triviaBloc,
       Category category,
       double height,
-      String dificulty) {
+      String dificulty,
+      Color splashColor) {
     return MaterialButton(
       minWidth: width * 0.3,
       elevation: 10,
@@ -152,7 +159,7 @@ class CategoriesScreen extends StatelessWidget {
       },
       shape: const StadiumBorder(),
       color: Colors.grey.shade300,
-      splashColor: Colors.green,
+      splashColor: splashColor,
       child: Text(
         dificulty,
         style: GoogleFonts.fredoka(
