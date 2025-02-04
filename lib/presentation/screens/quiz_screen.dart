@@ -190,10 +190,8 @@ class QuizScreen extends StatelessWidget {
                               color: Colors.white,
                               minWidth: width * 0.6,
                               onPressed: () {
-                                //ToDo:
-                                //Validar respuesta correcta
-
                                 showDialog(
+                                    barrierDismissible: false,
                                     context: context,
                                     builder: (context) {
                                       return AlertDialog(
@@ -261,6 +259,8 @@ class QuizScreen extends StatelessWidget {
                                         ),
                                       );
                                     });
+
+                                //ToDo
                                 //almacenar numero de respuestas correctas
                                 //pausar y reanudar temporizador
 
