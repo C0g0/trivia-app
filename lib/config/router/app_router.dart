@@ -5,4 +5,5 @@ final Map<String, Widget Function(BuildContext)> appRouter = {
   'home': (context) => const HomeScreen(),
   'categories': (context) => const CategoriesScreen(),
   'quiz': (context) => const QuizScreen(),
+  'dashboard': (context) => const DashboardScreen(),
 };

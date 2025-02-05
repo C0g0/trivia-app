@@ -9,6 +9,8 @@ class TriviaState extends Equatable {
   final int correctAnswers;
   final int remainingTime;
   final TimerStatus timerStatus;
+  final bool showingAnswer;
+  final bool isGamePaused;
 
   const TriviaState(
       {this.isLoading = false,
@@ -16,7 +18,9 @@ class TriviaState extends Equatable {
       this.questions = const [],
       this.correctAnswers = 0,
       this.remainingTime = 60,
-      this.timerStatus = TimerStatus.initial});
+      this.timerStatus = TimerStatus.initial,
+      this.showingAnswer = false,
+      this.isGamePaused = false});
 
   TriviaState copyWith(
           {bool? isLoading,
@@ -24,14 +28,18 @@ class TriviaState extends Equatable {
           List<Question>? questions,
           int? correctAnswers,
           int? remainingTime,
-          TimerStatus? timerStatus}) =>
+          TimerStatus? timerStatus,
+          bool? showingAnswer,
+          bool? isGamePaused}) =>
       TriviaState(
           isLoading: isLoading ?? this.isLoading,
           categories: categories ?? this.categories,
           questions: questions ?? this.questions,
           correctAnswers: correctAnswers ?? this.correctAnswers,
           remainingTime: remainingTime ?? this.remainingTime,
-          timerStatus: timerStatus ?? this.timerStatus);
+          timerStatus: timerStatus ?? this.timerStatus,
+          showingAnswer: showingAnswer ?? this.showingAnswer,
+          isGamePaused: isGamePaused ?? this.isGamePaused);
 
   @override
   List<Object> get props => [
@@ -40,6 +48,8 @@ class TriviaState extends Equatable {
         questions,
         correctAnswers,
         remainingTime,
-        timerStatus
+        timerStatus,
+        showingAnswer,
+        isGamePaused
       ];
 }

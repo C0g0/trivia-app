@@ -38,6 +38,14 @@ class TriviaBloc extends Bloc<TriviaEvent, TriviaState> {
     on<NewCorrectAnswer>((event, emit) =>
         emit(state.copyWith(correctAnswers: state.correctAnswers + 1)));
 
+    on<ShowingAnswer>((event, emit) {
+      emit(state.copyWith(showingAnswer: !state.showingAnswer));
+    });
+
+    on<GamePaused>((event, emit) {
+      emit(state.copyWith(isGamePaused: event.isGamePaused));
+    });
+
     on<ResetCorrectAnswers>((event, emit) {
       emit(state.copyWith(correctAnswers: 0));
     });
@@ -84,6 +92,7 @@ class TriviaBloc extends Bloc<TriviaEvent, TriviaState> {
   void pauseResumeTimer() {
     if (state.timerStatus == TimerStatus.running) {
       _timerSubscription.pause();
+
       add(UpdateRemainingTime(
           timerStatus: TimerStatus.paused,
           newRemainingTime: state.remainingTime));
@@ -92,7 +101,12 @@ class TriviaBloc extends Bloc<TriviaEvent, TriviaState> {
           timerStatus: TimerStatus.running,
           newRemainingTime: state.remainingTime));
       _timerSubscription.resume();
+      add(const GamePaused(false));
     }
+  }
+
+  void pauseGame() {
+    add(const GamePaused(true));
   }
 
   void cancelTimer() {

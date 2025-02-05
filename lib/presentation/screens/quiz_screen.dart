@@ -28,11 +28,31 @@ class QuizScreen extends StatelessWidget {
             builder: (context, triviaState) {
           if (triviaState.isLoading) {
             return LoadingAlert(
-              height: height,
-              width: width,
-              content: 'Creating new game...',
+              height: 0.2,
+              width: 0.5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(
+                    // backgroundColor: Colors.red,
+                    strokeWidth: 8,
+                    strokeCap: StrokeCap.butt,
+                    strokeAlign: 1,
+                    color: Color.fromARGB(255, 255, 139, 4),
+                  ),
+                  SizedBox(
+                    height: height * 0.05,
+                  ),
+                  Text(
+                    'Creating New Game...',
+                    style: GoogleFonts.poppins(
+                        fontSize: height * 0.018, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             );
           }
+
           return Stack(
             children: [
               // Questions / Timer / Pause Button
@@ -90,6 +110,7 @@ class QuizScreen extends StatelessWidget {
                         shape: const StadiumBorder(),
                         onPressed: () {
                           triviaBloc.pauseResumeTimer();
+                          triviaBloc.pauseGame();
                         },
                         padding: EdgeInsets.all(height * 0.01),
                         child: triviaState.timerStatus == TimerStatus.running
@@ -142,8 +163,55 @@ class QuizScreen extends StatelessWidget {
                               fontWeight: FontWeight.w500),
                         ))),
               ),
-              _questionCards(
-                  triviaState, height, width, cardSwiperController, triviaBloc),
+              _questionCards(triviaState, height, width, cardSwiperController,
+                  triviaBloc, context),
+              triviaState.isGamePaused
+                  ? Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: Colors.grey.withOpacity(0.8),
+                      child: Center(
+                        child: Container(
+                          height: height * 0.45,
+                          width: width * 0.5,
+                          decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 255, 253, 231)
+                                  .withOpacity(0.9),
+                              borderRadius: BorderRadius.circular(20)),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: width * 0.05),
+                          child: Column(
+                            children: [
+                              Image.asset(
+                                'assets/pause.png',
+                                height: height * 0.3,
+                              ),
+                              Text(
+                                'Game Paused',
+                                style: GoogleFonts.poppins(
+                                    fontSize: height * 0.02,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: height * 0.03,
+                              ),
+                              MaterialButton(
+                                onPressed: () => triviaBloc.pauseResumeTimer(),
+                                color: const Color.fromARGB(255, 255, 139, 4),
+                                shape: const StadiumBorder(),
+                                child: Text(
+                                  'Resume',
+                                  style: GoogleFonts.poppins(
+                                      fontSize: height * 0.018,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  : Container(),
             ],
           );
         })),
@@ -151,8 +219,13 @@ class QuizScreen extends StatelessWidget {
     );
   }
 
-  CardSwiper _questionCards(TriviaState triviaState, double height,
-      double width, CardSwiperController controller, TriviaBloc triviaBloc) {
+  CardSwiper _questionCards(
+      TriviaState triviaState,
+      double height,
+      double width,
+      CardSwiperController controller,
+      TriviaBloc triviaBloc,
+      BuildContext context) {
     return CardSwiper(
       cardBuilder: (context, index, horizontalOffsetPercentage,
           verticalOffsetPercentage) {
@@ -208,6 +281,7 @@ class QuizScreen extends StatelessWidget {
                               color: Colors.white,
                               minWidth: width * 0.6,
                               onPressed: () {
+                                //Evluar que este corriendo el temporizador
                                 if (triviaState.timerStatus ==
                                     TimerStatus.running) {
                                   //evaluar respuesta correcta y mostrar alerta
@@ -221,8 +295,6 @@ class QuizScreen extends StatelessWidget {
 
                                   //pausar y reanudar temporizador
                                   triviaBloc.pauseResumeTimer();
-
-                                  // controller.swipe(CardSwiperDirection.left);
                                 }
                               },
                               shape: StadiumBorder(
@@ -255,6 +327,7 @@ class QuizScreen extends StatelessWidget {
       duration: const Duration(milliseconds: 500),
       onEnd: () {
         //ToDo Transición a la pantalla final
+        Navigator.pushReplacementNamed(context, 'dashboard');
       },
     );
   }
@@ -281,6 +354,8 @@ class QuizScreen extends StatelessWidget {
                     Navigator.of(context).pop();
                     // Resume the timer
                     context.read<TriviaBloc>().pauseResumeTimer();
+
+                    context.read<TriviaBloc>().add(const ShowingAnswer());
                   },
                   child: Container(
                     width: width * 0.5,

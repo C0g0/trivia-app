@@ -23,7 +23,29 @@ class CategoriesScreen extends StatelessWidget {
             final categories = triviaState.categories;
             if (triviaState.isLoading) {
               return LoadingAlert(
-                  content: 'Loading...', height: height, width: width);
+                  height: 0.2,
+                  width: 0.5,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircularProgressIndicator(
+                        // backgroundColor: Colors.red,
+                        strokeWidth: 8,
+                        strokeCap: StrokeCap.butt,
+                        strokeAlign: 1,
+                        color: Color.fromARGB(255, 255, 139, 4),
+                      ),
+                      SizedBox(
+                        height: height * 0.05,
+                      ),
+                      Text(
+                        'Loading...',
+                        style: GoogleFonts.poppins(
+                            fontSize: height * 0.018,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ));
             }
             return Padding(
               padding: EdgeInsets.only(

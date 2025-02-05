@@ -37,3 +37,12 @@ class UpdateRemainingTime extends TriviaEvent {
 class ResetCorrectAnswers extends TriviaEvent {
   const ResetCorrectAnswers();
 }
+
+class ShowingAnswer extends TriviaEvent {
+  const ShowingAnswer();
+}
+
+class GamePaused extends TriviaEvent {
+  final bool isGamePaused;
+  const GamePaused(this.isGamePaused);
+}
