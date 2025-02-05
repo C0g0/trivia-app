@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:html_unescape/html_unescape.dart';
 
+import 'package:quiz_app/domain/entities/question.dart';
 import 'package:quiz_app/presentation/blocs/trivia/trivia_bloc.dart';
 import 'package:quiz_app/presentation/widgets/widgets.dart';
 
@@ -16,6 +17,7 @@ class QuizScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CardSwiperController cardSwiperController = CardSwiperController();
+    final TriviaBloc triviaBloc = context.read<TriviaBloc>();
     final size = MediaQuery.of(context).size;
     final height = size.height;
     final width = size.width;
@@ -49,7 +51,7 @@ class QuizScreen extends StatelessWidget {
                           Icons.question_mark_rounded,
                         ),
                         Text(
-                          '4/10',
+                          '${triviaState.correctAnswers}/${triviaState.questions.length}',
                           style: GoogleFonts.poppins(
                               fontSize: height * 0.02,
                               fontWeight: FontWeight.w500),
@@ -126,7 +128,8 @@ class QuizScreen extends StatelessWidget {
                               fontSize: height * 0.02,
                               fontWeight: FontWeight.w500),
                         )))),
-            _questionCards(triviaState, height, width, cardSwiperController),
+            _questionCards(
+                triviaState, height, width, cardSwiperController, triviaBloc),
           ],
         );
       })),
@@ -134,7 +137,7 @@ class QuizScreen extends StatelessWidget {
   }
 
   CardSwiper _questionCards(TriviaState triviaState, double height,
-      double width, CardSwiperController controller) {
+      double width, CardSwiperController controller, TriviaBloc triviaBloc) {
     return CardSwiper(
       cardBuilder: (context, index, horizontalOffsetPercentage,
           verticalOffsetPercentage) {
@@ -190,78 +193,16 @@ class QuizScreen extends StatelessWidget {
                               color: Colors.white,
                               minWidth: width * 0.6,
                               onPressed: () {
-                                showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        actions: [
-                                          Center(
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                //ToDo:
-                                                // Reanudar el temporizador
-                                                controller.swipe(
-                                                    CardSwiperDirection.left);
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Container(
-                                                width: width * 0.5,
-                                                height: height * 0.05,
-                                                decoration: BoxDecoration(
-                                                    border:
-                                                        Border.all(width: 2),
-                                                    color: const Color.fromARGB(
-                                                        255, 255, 253, 231),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            25)),
-                                                child: Center(
-                                                    child: Text(
-                                                  'Next question',
-                                                  style: GoogleFonts.poppins(
-                                                      fontSize: height * 0.015,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                )),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                        content: SizedBox(
-                                          height: height * 0.3,
-                                          child: Column(
-                                            children: [
-                                              Image.asset(
-                                                (answer ==
-                                                        question.correctAnswer)
-                                                    ? 'assets/check.png'
-                                                    : 'assets/cross.png',
-                                                width: width * 0.3,
-                                              ),
-                                              SizedBox(
-                                                height: height * 0.05,
-                                              ),
-                                              Text(
-                                                'Correct Answer',
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: height * 0.018,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              Text(
-                                                question.correctAnswer,
-                                                style: GoogleFonts.bungee(
-                                                    fontSize: height * 0.018),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    });
-
+                                //evaluar respuesta correcta y mostrar alerta
+                                _answerAlert(context, controller, width, height,
+                                    answer, question);
                                 //ToDo
-                                //almacenar numero de respuestas correctas
+                                //almacenar respuestas correctas
+                                if (answer == question.correctAnswer) {
+                                  triviaBloc.add(const NewCorrectAnswer());
+                                }
+                                //mostrar numero de preguntas que avanzamos
+
                                 //pausar y reanudar temporizador
 
                                 // controller.swipe(CardSwiperDirection.left);
@@ -294,6 +235,77 @@ class QuizScreen extends StatelessWidget {
       backCardOffset: Offset(0, height * 0.05),
       allowedSwipeDirection: const AllowedSwipeDirection.none(),
       duration: const Duration(milliseconds: 500),
+      onEnd: () {
+        //ToDo Transición a la pantalla final
+      },
     );
+  }
+
+  Future<dynamic> _answerAlert(
+      BuildContext context,
+      CardSwiperController controller,
+      double width,
+      double height,
+      String answer,
+      Question question) {
+    return showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            actions: [
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    //ToDo:
+                    // Reanudar el temporizador
+                    controller.swipe(CardSwiperDirection.left);
+                    Navigator.of(context).pop();
+                  },
+                  child: Container(
+                    width: width * 0.5,
+                    height: height * 0.05,
+                    decoration: BoxDecoration(
+                        border: Border.all(width: 2),
+                        color: const Color.fromARGB(255, 255, 253, 231),
+                        borderRadius: BorderRadius.circular(25)),
+                    child: Center(
+                        child: Text(
+                      'Next question',
+                      style: GoogleFonts.poppins(
+                          fontSize: height * 0.015,
+                          fontWeight: FontWeight.w500),
+                    )),
+                  ),
+                ),
+              ),
+            ],
+            content: SizedBox(
+              height: height * 0.3,
+              child: Column(
+                children: [
+                  Image.asset(
+                    (answer == question.correctAnswer)
+                        ? 'assets/check.png'
+                        : 'assets/cross.png',
+                    width: width * 0.3,
+                  ),
+                  SizedBox(
+                    height: height * 0.05,
+                  ),
+                  Text(
+                    'Correct Answer',
+                    style: GoogleFonts.poppins(
+                        fontSize: height * 0.018, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    question.correctAnswer,
+                    style: GoogleFonts.bungee(fontSize: height * 0.018),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

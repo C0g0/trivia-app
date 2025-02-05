@@ -29,6 +29,9 @@ class TriviaBloc extends Bloc<TriviaEvent, TriviaState> {
     on<Loading>(
       (event, emit) => emit(state.copyWith(isLoading: !state.isLoading)),
     );
+
+    on<NewCorrectAnswer>((event, emit) =>
+        emit(state.copyWith(correctAnswers: state.correctAnswers + 1)));
     _init();
   }
 

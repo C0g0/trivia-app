@@ -22,3 +22,7 @@ class LoadQuestions extends TriviaEvent {
 class Loading extends TriviaEvent {
   const Loading();
 }
+
+class NewCorrectAnswer extends TriviaEvent {
+  const NewCorrectAnswer();
+}
