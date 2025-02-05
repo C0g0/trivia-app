@@ -21,118 +21,133 @@ class QuizScreen extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final height = size.height;
     final width = size.width;
-    return Scaffold(
-      body: BackgroundApp(child:
-          BlocBuilder<TriviaBloc, TriviaState>(builder: (context, triviaState) {
-        if (triviaState.isLoading) {
-          return LoadingAlert(
-            height: height,
-            width: width,
-            content: 'Creating new game...',
-          );
-        }
-        return Stack(
-          children: [
-            Positioned(
-              top: height * 0.08,
-              width: width * 0.8,
-              left: width * 0.1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(height * 0.01),
-                    decoration: BoxDecoration(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        body: BackgroundApp(child: BlocBuilder<TriviaBloc, TriviaState>(
+            builder: (context, triviaState) {
+          if (triviaState.isLoading) {
+            return LoadingAlert(
+              height: height,
+              width: width,
+              content: 'Creating new game...',
+            );
+          }
+          return Stack(
+            children: [
+              // Questions / Timer / Pause Button
+              Positioned(
+                  top: height * 0.08,
+                  width: width * 0.8,
+                  left: width * 0.1,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(height * 0.01),
+                        decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 255, 253, 231),
+                            borderRadius: BorderRadius.circular(25)),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.question_mark_rounded,
+                            ),
+                            Text(
+                              '${triviaState.correctAnswers}/${triviaState.questions.length}',
+                              style: GoogleFonts.poppins(
+                                  fontSize: height * 0.02,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(height * 0.01),
+                        decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 255, 253, 231),
+                            borderRadius: BorderRadius.circular(25)),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.timer_outlined,
+                            ),
+                            Text(
+                              // Get the remaining time adding a 0 on the left and an S on the right
+                              triviaState.remainingTime
+                                  .toString()
+                                  .padLeft(2, '0')
+                                  .padRight(3, 's'),
+                              style: GoogleFonts.poppins(
+                                  fontSize: height * 0.02,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                      MaterialButton(
                         color: const Color.fromARGB(255, 255, 253, 231),
-                        borderRadius: BorderRadius.circular(25)),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.question_mark_rounded,
-                        ),
-                        Text(
-                          '${triviaState.correctAnswers}/${triviaState.questions.length}',
-                          style: GoogleFonts.poppins(
-                              fontSize: height * 0.02,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(height * 0.01),
-                    decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 255, 253, 231),
-                        borderRadius: BorderRadius.circular(25)),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.timer_outlined,
-                        ),
-                        Text(
-                          '2:00',
-                          style: GoogleFonts.poppins(
-                              fontSize: height * 0.02,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                  ),
-                  MaterialButton(
-                    color: const Color.fromARGB(255, 255, 253, 231),
-                    shape: const StadiumBorder(),
-                    onPressed: () {},
-                    padding: EdgeInsets.all(height * 0.01),
-                    child: Row(
-                      children: [
-                        // TODO Resume / Pause
-                        const Icon(
-                          Icons.play_arrow_rounded,
-                        ),
-                        Text(
-                          'Resume',
-                          style: GoogleFonts.poppins(
-                              fontSize: height * 0.02,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                    // Row(
-                    //   children: [
-                    //     const Icon(
-                    //       Icons.pause,
-                    //     ),
-                    //     Text(
-                    //       'Pause',
-                    //       style: GoogleFonts.poppins(
-                    //           fontSize: height * 0.02,
-                    //           fontWeight: FontWeight.w500),
-                    //     ),
-                    //   ],
-                    // ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
+                        shape: const StadiumBorder(),
+                        onPressed: () {
+                          triviaBloc.pauseResumeTimer();
+                        },
+                        padding: EdgeInsets.all(height * 0.01),
+                        child: triviaState.timerStatus == TimerStatus.running
+                            ? Row(
+                                children: [
+                                  const Icon(
+                                    Icons.pause,
+                                  ),
+                                  Text(
+                                    'Pause',
+                                    style: GoogleFonts.poppins(
+                                        fontSize: height * 0.02,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                children: [
+                                  const Icon(
+                                    Icons.play_arrow_rounded,
+                                  ),
+                                  Text(
+                                    'Resume',
+                                    style: GoogleFonts.poppins(
+                                        fontSize: height * 0.02,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ],
+                  )),
+              // Quit Button
+              Positioned(
                 bottom: height * 0.03,
                 width: width,
                 child: Center(
                     child: MaterialButton(
                         shape: const StadiumBorder(),
                         color: Colors.red,
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          triviaBloc.cancelTimer();
+                          triviaBloc.add(const ResetCorrectAnswers());
+                        },
                         child: Text(
                           'Quit',
                           style: GoogleFonts.poppins(
                               fontSize: height * 0.02,
                               fontWeight: FontWeight.w500),
-                        )))),
-            _questionCards(
-                triviaState, height, width, cardSwiperController, triviaBloc),
-          ],
-        );
-      })),
+                        ))),
+              ),
+              _questionCards(
+                  triviaState, height, width, cardSwiperController, triviaBloc),
+            ],
+          );
+        })),
+      ),
     );
   }
 
@@ -193,19 +208,22 @@ class QuizScreen extends StatelessWidget {
                               color: Colors.white,
                               minWidth: width * 0.6,
                               onPressed: () {
-                                //evaluar respuesta correcta y mostrar alerta
-                                _answerAlert(context, controller, width, height,
-                                    answer, question);
-                                //ToDo
-                                //almacenar respuestas correctas
-                                if (answer == question.correctAnswer) {
-                                  triviaBloc.add(const NewCorrectAnswer());
+                                if (triviaState.timerStatus ==
+                                    TimerStatus.running) {
+                                  //evaluar respuesta correcta y mostrar alerta
+                                  _answerAlert(context, controller, width,
+                                      height, answer, question);
+                                  //ToDo
+                                  //almacenar respuestas correctas
+                                  if (answer == question.correctAnswer) {
+                                    triviaBloc.add(const NewCorrectAnswer());
+                                  }
+
+                                  //pausar y reanudar temporizador
+                                  triviaBloc.pauseResumeTimer();
+
+                                  // controller.swipe(CardSwiperDirection.left);
                                 }
-                                //mostrar numero de preguntas que avanzamos
-
-                                //pausar y reanudar temporizador
-
-                                // controller.swipe(CardSwiperDirection.left);
                               },
                               shape: StadiumBorder(
                                   side: BorderSide(
@@ -257,10 +275,12 @@ class QuizScreen extends StatelessWidget {
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    //ToDo:
-                    // Reanudar el temporizador
+                    // Swipe left the question card
                     controller.swipe(CardSwiperDirection.left);
+                    // Close the alert dialog
                     Navigator.of(context).pop();
+                    // Resume the timer
+                    context.read<TriviaBloc>().pauseResumeTimer();
                   },
                   child: Container(
                     width: width * 0.5,

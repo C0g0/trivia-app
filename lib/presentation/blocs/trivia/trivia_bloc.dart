@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -13,6 +15,9 @@ part 'trivia_state.dart';
 class TriviaBloc extends Bloc<TriviaEvent, TriviaState> {
   final triviaRepository =
       TriviaRepositoryImpl(datasource: TriviaDbDatasource());
+
+  late StreamSubscription<int> _timerSubscription;
+  final int _remainingTime = 60;
 
   TriviaBloc()
       : super(
@@ -32,6 +37,15 @@ class TriviaBloc extends Bloc<TriviaEvent, TriviaState> {
 
     on<NewCorrectAnswer>((event, emit) =>
         emit(state.copyWith(correctAnswers: state.correctAnswers + 1)));
+
+    on<ResetCorrectAnswers>((event, emit) {
+      emit(state.copyWith(correctAnswers: 0));
+    });
+
+    on<UpdateRemainingTime>((event, emit) => emit(state.copyWith(
+        remainingTime: event.newRemainingTime,
+        timerStatus: event.timerStatus)));
+
     _init();
   }
 
@@ -49,5 +63,47 @@ class TriviaBloc extends Bloc<TriviaEvent, TriviaState> {
       dificulty: dificulty,
     );
     add(LoadQuestions(questions: questions));
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timerSubscription = Stream.periodic(
+            const Duration(seconds: 1), (count) => _remainingTime - count - 1)
+        .take(_remainingTime)
+        .listen((timeLeft) {
+      if (timeLeft > 0) {
+        add(UpdateRemainingTime(
+            newRemainingTime: timeLeft, timerStatus: TimerStatus.running));
+      } else {
+        add(const UpdateRemainingTime(
+            newRemainingTime: 00, timerStatus: TimerStatus.completed));
+      }
+    });
+  }
+
+  void pauseResumeTimer() {
+    if (state.timerStatus == TimerStatus.running) {
+      _timerSubscription.pause();
+      add(UpdateRemainingTime(
+          timerStatus: TimerStatus.paused,
+          newRemainingTime: state.remainingTime));
+    } else if (state.timerStatus == TimerStatus.paused) {
+      add(UpdateRemainingTime(
+          timerStatus: TimerStatus.running,
+          newRemainingTime: state.remainingTime));
+      _timerSubscription.resume();
+    }
+  }
+
+  void cancelTimer() {
+    _timerSubscription.cancel();
+    add(const UpdateRemainingTime(
+        timerStatus: TimerStatus.initial, newRemainingTime: 60));
+  }
+
+  @override
+  Future<void> close() {
+    _timerSubscription.cancel();
+    return super.close();
   }
 }

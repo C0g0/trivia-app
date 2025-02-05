@@ -26,3 +26,14 @@ class Loading extends TriviaEvent {
 class NewCorrectAnswer extends TriviaEvent {
   const NewCorrectAnswer();
 }
+
+class UpdateRemainingTime extends TriviaEvent {
+  final int newRemainingTime;
+  final TimerStatus timerStatus;
+  const UpdateRemainingTime(
+      {required this.timerStatus, required this.newRemainingTime});
+}
+
+class ResetCorrectAnswers extends TriviaEvent {
+  const ResetCorrectAnswers();
+}
